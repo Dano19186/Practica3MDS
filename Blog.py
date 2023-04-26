@@ -1,27 +1,22 @@
 from selenium import webdriver
-from selenium.webdriver.common.by import By
 import re
 
 
-def enlacesRec(source, original):
-    encontrados = re.findall(regex, source)
-    if encontrados:
-        for i in encontrados:
-            if i not in enlaces:
-                enlaces.add(i)
-                cuerpo = descargarHTML(original + i)
-                enlacesRec(cuerpo, original + i)
-        return enlaces
-    else:
-        return False
+def enlacesRec(original):
+    cuerpo = descargarHTML(original)
+    inicial = re.findall(regex, cuerpo)
+    for i in inicial:
+        enlace = (raiz + "notice/" + i[1])
+        if enlace not in enlaces:
+            enlaces.add(enlace)
+            enlacesRec(enlace)
 
 
 def descargarHTML(link):
     driver.get(link)
-    web = driver.execute_script("return document.body")
-    source = web.get_attribute('innerHTML')
-    fichero.write(source)
-    return source
+    body = driver.execute_script("return document.body.innerHTML")
+    fichero.write(body)
+    return body
 
 
 def buscar(body):
@@ -29,17 +24,17 @@ def buscar(body):
     return len(unis)
 
 
-regex = r'<a href="(\S*)"'
+regex = r'(<a href=\"\/notice\/|<a href=\")([^\";#]{1,})\"'
+
 URJC = r'\bURJC\b'
 driver = webdriver.Chrome()
-original = "https://r2-ctf-vulnerable.numa.host/"
-fichero = open("cuerpos.txt", 'w')
+raiz = "https://r2-ctf-vulnerable.numa.host/"
+fichero = open("cuerpos.txt", 'a')
 
 enlaces = set()
-cuerpo = descargarHTML(original)
-validos = enlacesRec(cuerpo, original)
+
+enlacesRec(raiz)
 fichero.close()
 leer = open("cuerpos.txt", "r")
 num = re.findall(URJC, leer.read())
 print(len(num))
-print(validos)
