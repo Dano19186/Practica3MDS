@@ -1,12 +1,40 @@
 from selenium import webdriver
-from selenium.webdriver.common.by import By
-import requests
+import re
+
+
+def enlacesRec(original):
+    cuerpo = descargarHTML(original)
+    inicial = re.findall(regex, cuerpo)
+    for i in inicial:
+        enlace = (raiz + "notice/" + i[1])
+        if enlace not in enlaces:
+            enlaces.add(enlace)
+            enlacesRec(enlace)
+
+
+def descargarHTML(link):
+    driver.get(link)
+    body = driver.execute_script("return document.body.innerHTML")
+    fichero.write(body)
+    return body
+
+
+def buscar(body):
+    unis = re.findall(URJC, body)
+    return len(unis)
+
+
+regex = r'(<a href=\"\/notice\/|<a href=\")([^\";#]{1,})\"'
+
+URJC = r'\bURJC\b'
 driver = webdriver.Chrome()
+raiz = "https://r2-ctf-vulnerable.numa.host/"
+fichero = open("cuerpos.txt", 'a')
 
-driver.get("https://r2-ctf-vulnerable.numa.host/")
+enlaces = set()
 
-h = driver.execute_script("return document.body.innerHTML;")
-print(h)
-driver.close()
-#print(requests.get(url='https://r2-ctf-vulnerable.numa.host/').text)
-
+enlacesRec(raiz)
+fichero.close()
+leer = open("cuerpos.txt", "r")
+num = re.findall(URJC, leer.read())
+print(len(num))
