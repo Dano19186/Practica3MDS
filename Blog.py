@@ -18,12 +18,6 @@ def descargarHTML(link):
     fichero.write(body)
     return body
 
-
-def buscar(body):
-    unis = re.findall(URJC, body)
-    return len(unis)
-
-
 regex = r'(<a href=\"\/notice\/|<a href=\")([^\";#]{1,})\"'
 
 URJC = r'\bURJC\b'
